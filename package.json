@@ -1,0 +1,117 @@
+{
+  "name": "@1money/hooks",
+  "version": "0.1.0",
+  "description": "React hooks for 1money front-end projects",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "types": "es/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "lib",
+    "es"
+  ],
+  "exports": {
+    ".": {
+      "types": "./es/index.d.ts",
+      "import": "./es/index.js",
+      "require": "./lib/index.js"
+    },
+    "./useControlledState": {
+      "types": "./es/useControlledState/index.d.ts",
+      "import": "./es/useControlledState/index.js",
+      "require": "./lib/useControlledState/index.js"
+    },
+    "./useEventCallback": {
+      "types": "./es/useEventCallback/index.d.ts",
+      "import": "./es/useEventCallback/index.js",
+      "require": "./lib/useEventCallback/index.js"
+    },
+    "./useLatest": {
+      "types": "./es/useLatest/index.d.ts",
+      "import": "./es/useLatest/index.js",
+      "require": "./lib/useLatest/index.js"
+    },
+    "./useLayoutEffect": {
+      "types": "./es/useLayoutEffect/index.d.ts",
+      "import": "./es/useLayoutEffect/index.js",
+      "require": "./lib/useLayoutEffect/index.js"
+    },
+    "./useLayoutState": {
+      "types": "./es/useLayoutState/index.d.ts",
+      "import": "./es/useLayoutState/index.js",
+      "require": "./lib/useLayoutState/index.js"
+    },
+    "./useMemoizedFn": {
+      "types": "./es/useMemoizedFn/index.d.ts",
+      "import": "./es/useMemoizedFn/index.js",
+      "require": "./lib/useMemoizedFn/index.js"
+    },
+    "./usePrevious": {
+      "types": "./es/usePrevious/index.d.ts",
+      "import": "./es/usePrevious/index.js",
+      "require": "./lib/usePrevious/index.js"
+    },
+    "./useSafeState": {
+      "types": "./es/useSafeState/index.d.ts",
+      "import": "./es/useSafeState/index.js",
+      "require": "./lib/useSafeState/index.js"
+    },
+    "./useSyncState": {
+      "types": "./es/useSyncState/index.d.ts",
+      "import": "./es/useSyncState/index.js",
+      "require": "./lib/useSyncState/index.js"
+    },
+    "./useUpdateEffect": {
+      "types": "./es/useUpdateEffect/index.d.ts",
+      "import": "./es/useUpdateEffect/index.js",
+      "require": "./lib/useUpdateEffect/index.js"
+    }
+  },
+  "scripts": {
+    "build": "father build",
+    "dev": "father dev",
+    "test": "vitest run",
+    "lint": "npm run lint:prettier && npm run lint:es",
+    "lint:fix": "npm run lint:prettier_fix && npm run lint:es_fix",
+    "lint:es": "eslint src/",
+    "lint:es_fix": "eslint src/ --fix",
+    "lint:prettier": "prettier --check src/",
+    "lint:prettier_fix": "prettier --write src/"
+  },
+  "keywords": [],
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/1Money-Co/1money-hooks"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^9.24.0",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@types/jest": "29.5.12",
+    "@types/node": "~18.19.86",
+    "@types/react": "~19.1.2",
+    "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "~8.23.0",
+    "@typescript-eslint/parser": "~8.23.0",
+    "eslint": "~9.20.1",
+    "eslint-config-prettier": "~10.0.3",
+    "eslint-plugin-prettier": "~5.2.6",
+    "eslint-plugin-react": "~7.37.5",
+    "father": "^4.5.1",
+    "globals": "^15.15.0",
+    "jest": "~29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jsdom": "^29.0.0",
+    "prettier": "~3.5.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.2.4",
+    "ts-jest": "~29.2.6",
+    "typescript": "~5.5.4",
+    "vitest": "^4.1.0"
+  }
+}
