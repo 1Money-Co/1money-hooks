@@ -1,6 +1,6 @@
 {
   "name": "@1money/hooks",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React hooks for 1money front-end projects",
   "main": "lib/index.js",
   "module": "es/index.js",
