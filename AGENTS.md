@@ -73,3 +73,22 @@ Path alias `@/*` maps to `src/*` in both `tsconfig.json` and `vitest.config.ts`.
 2. Create `src/useNewHook/__tests__/index.test.ts` with tests.
 3. Export from `src/index.ts`.
 4. Add a per-hook export path in `package.json` under `"exports"`.
+5. Update the `skills/1money-react-hooks` skill: add a row to the
+   need → hook table in `SKILL.md` and document the hook (signature,
+   the bug it prevents, a worked example) in the matching file under
+   `references/`.
+
+## Keeping the Skill in Sync
+
+The `skills/1money-react-hooks` skill is the source of truth that guides
+consumers on which hook to reach for. **Any change that adds, removes, or
+modifies a hook MUST be mirrored in the skill:**
+
+- **New hook** → add it to the need → hook table and a `references/` entry
+  (see step 5 above).
+- **Changed signature or behavior** → update that hook's reference file so
+  the signature, example, and "bug it prevents" stay accurate.
+- **Removed/renamed hook** → remove or rename its table row and reference.
+
+A PR that touches `src/` hooks without a corresponding
+`skills/1money-react-hooks` update is incomplete.

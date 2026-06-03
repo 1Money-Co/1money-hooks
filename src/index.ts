@@ -10,3 +10,15 @@ export { default as useSyncState } from './useSyncState';
 export { default as useUpdateEffect } from './useUpdateEffect';
 export { default as useLayoutState, useTimeoutLock } from './useLayoutState';
 export type { Updater } from './useLayoutState';
+export {
+  default as useQueryState,
+  queryString,
+  queryNumber,
+  queryBoolean,
+  queryJson,
+} from './useQueryState';
+export type {
+  Parser,
+  Serializer,
+  QueryStateOptions,
+} from './useQueryState';
