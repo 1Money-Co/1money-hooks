@@ -1,6 +1,6 @@
 {
   "name": "@1money/hooks",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "React hooks for 1money front-end projects",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -40,6 +40,11 @@
       "types": "./es/useLayoutState/index.d.ts",
       "import": "./es/useLayoutState/index.js",
       "require": "./lib/useLayoutState/index.js"
+    },
+    "./useQueryState": {
+      "types": "./es/useQueryState/index.d.ts",
+      "import": "./es/useQueryState/index.js",
+      "require": "./lib/useQueryState/index.js"
     },
     "./useMemoizedFn": {
       "types": "./es/useMemoizedFn/index.d.ts",
