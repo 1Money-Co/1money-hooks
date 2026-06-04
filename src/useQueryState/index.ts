@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+'use client';
+
+import { useSearchParams } from 'next/navigation';
 import useMemoizedFn from '../useMemoizedFn';
 
 /** Turn a raw query string into a typed value. */
@@ -57,27 +59,27 @@ export const queryJson: Parser<unknown> = value =>
 const isBrowser = typeof window !== 'undefined';
 
 /**
- * Subscribers re-read the URL when any instance
- * mutates it. `history.pushState/replaceState` do
- * not emit `popstate`, so we notify manually.
- */
-const listeners = new Set<() => void>();
-
-const emit = (): void => {
-  listeners.forEach(fn => fn());
-};
-
-/**
  * Sync a piece of React state with a URL query
  * parameter, so it survives refreshes and is
  * shareable via the link.
  *
- * Reads/writes go through native
- * `history.pushState/replaceState`, which keeps it
- * compatible with the Next.js App Router (it does
- * not trigger a route re-mount). Because the value
- * is reactive, using it as a SWR/React Query key
+ * Reading is reactive via Next's `useSearchParams`;
+ * writing goes through the native
+ * `history.pushState/replaceState`, which the Next.js
+ * App Router intercepts and syncs back into
+ * `useSearchParams` *without* a server round-trip (no
+ * route re-render, no scroll-to-top). Because the
+ * value is reactive, using it as a SWR/React Query key
  * makes dependent requests refetch automatically.
+ *
+ * Constraints (inherited from `useSearchParams`):
+ * - Next.js App Router only; the calling component
+ *   must be a Client Component (`'use client'`).
+ * - On statically rendered routes, wrap the consumer
+ *   in `<Suspense>`; otherwise that subtree opts into
+ *   client-side rendering. During prerender the param
+ *   reads as absent, so `value` falls back to
+ *   `defaultValue ?? null`.
  *
  * @param key The query parameter name
  * @param options Parsing, serialization and history
@@ -111,40 +113,19 @@ function useQueryState<T>(
     history = 'replace',
   } = options;
 
-  const read = useMemoizedFn((): T | null => {
-    if (!isBrowser) {
-      return defaultValue ?? null;
-    }
-    const params = new URLSearchParams(
-      window.location.search,
-    );
-    const raw = params.get(key);
+  const parse = (raw: string | null): T | null => {
     if (raw === null) {
       return defaultValue ?? null;
     }
     return parser
       ? parser(raw)
       : (raw as unknown as T);
-  });
+  };
 
-  const [value, setValue] = useState<T | null>(read);
-
-  useEffect(() => {
-    const handler = (): void => setValue(read());
-    listeners.add(handler);
-    window.addEventListener('popstate', handler);
-    // Resync in case the URL changed between the
-    // initial render and this effect running.
-    handler();
-    return () => {
-      listeners.delete(handler);
-      window.removeEventListener(
-        'popstate',
-        handler,
-      );
-    };
-    // `read` is stable via useMemoizedFn.
-  }, [key, read]);
+  // Reactive read. Next re-renders consumers when the
+  // URL changes (including our own history writes).
+  const searchParams = useSearchParams();
+  const value = parse(searchParams.get(key));
 
   const set = useMemoizedFn<
     Parameters<SetQueryState<T>>,
@@ -153,15 +134,19 @@ function useQueryState<T>(
     if (!isBrowser) {
       return;
     }
-    const prev = read();
-    const resolved =
-      typeof next === 'function'
-        ? (next as (p: T | null) => T | null)(prev)
-        : next;
-
+    // Build from the live URL (not the captured
+    // `searchParams`) so consecutive writes in one
+    // tick see each other's result.
     const params = new URLSearchParams(
       window.location.search,
     );
+    const resolved =
+      typeof next === 'function'
+        ? (next as (p: T | null) => T | null)(
+            parse(params.get(key)),
+          )
+        : next;
+
     if (resolved === null || resolved === undefined) {
       params.delete(key);
     } else {
@@ -179,7 +164,6 @@ function useQueryState<T>(
     } else {
       window.history.replaceState(null, '', url);
     }
-    emit();
   });
 
   return [value, set];

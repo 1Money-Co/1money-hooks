@@ -70,10 +70,20 @@ setStatus(null);            // drops &status, keeps other params
 
 ## Key behaviors to mention when recommending it
 
-- **Next.js App Router safe.** Writes go through native
-  `history.pushState/replaceState`, which does *not* trigger a route
-  re-mount. This is why it's preferred over `router.push`/`router.replace`
-  for this kind of state.
+- **Next.js App Router only.** Reading is reactive via Next's
+  `useSearchParams`, so the hook works only inside a Client Component
+  (`'use client'`). `next` is an optional peer dependency (`>=14.0.0`).
+- **No route re-render on write.** Writes go through native
+  `history.pushState/replaceState`, which the App Router intercepts and
+  syncs back into `useSearchParams` *without* a server round-trip (no RSC
+  re-render, no scroll-to-top). This is why it's preferred over
+  `router.push`/`router.replace` for this kind of state — those navigate
+  and re-run server components.
+- **Wrap consumers in `<Suspense>` on static routes.** Like any
+  `useSearchParams` user, a statically rendered consumer must sit under a
+  `<Suspense>` boundary or that subtree opts into client-side rendering.
+  During prerender the param reads as absent, so the value falls back to
+  `defaultValue ?? null`.
 - **Reactive → drives data fetching.** Because the returned value is React
   state, using it as a SWR / React Query key makes dependent requests
   refetch automatically — no manual wiring.
@@ -84,7 +94,8 @@ setStatus(null);            // drops &status, keeps other params
 - **`setValue(null)` deletes the param** and preserves the others — the
   natural "no filter / show all" state.
 - **Cross-instance + back/forward sync.** Multiple components on the same
-  key stay in sync, and it reacts to `popstate`.
+  key stay in sync, and back/forward navigation works — both handled by
+  Next's `useSearchParams`, not custom listeners.
 
 ## Replaces
 
