@@ -3,13 +3,64 @@ import {
   describe,
   it,
   expect,
+  beforeAll,
   beforeEach,
+  vi,
 } from 'vitest';
+
+// Simulate the Next.js App Router: native history
+// writes are intercepted and synced into
+// `useSearchParams`. jsdom does not do this, so we
+// patch history to emit an event the mock listens to.
+const NAV_EVENT = 'next-nav-sync';
+
+vi.mock('next/navigation', async () => {
+  const { useSyncExternalStore } = await import(
+    'react'
+  );
+  return {
+    useSearchParams: () =>
+      new URLSearchParams(
+        useSyncExternalStore(
+          cb => {
+            window.addEventListener('popstate', cb);
+            window.addEventListener(NAV_EVENT, cb);
+            return () => {
+              window.removeEventListener(
+                'popstate',
+                cb,
+              );
+              window.removeEventListener(
+                NAV_EVENT,
+                cb,
+              );
+            };
+          },
+          () => window.location.search,
+          () => '',
+        ),
+      ),
+  };
+});
+
 import useQueryState, {
   queryNumber,
   queryBoolean,
   queryJson,
 } from '..';
+
+beforeAll(() => {
+  (['pushState', 'replaceState'] as const).forEach(
+    method => {
+      const original =
+        window.history[method].bind(window.history);
+      window.history[method] = (...args) => {
+        original(...args);
+        window.dispatchEvent(new Event(NAV_EVENT));
+      };
+    },
+  );
+});
 
 const setUrl = (search: string): void => {
   window.history.replaceState(
@@ -127,12 +178,8 @@ describe('useQueryState', () => {
   });
 
   it('syncs instances sharing a key', () => {
-    const a = renderHook(() =>
-      useQueryState('q'),
-    );
-    const b = renderHook(() =>
-      useQueryState('q'),
-    );
+    const a = renderHook(() => useQueryState('q'));
+    const b = renderHook(() => useQueryState('q'));
 
     act(() => {
       a.result.current[1]('shared');
@@ -158,7 +205,9 @@ describe('useQueryState', () => {
         '',
         '/?q=back',
       );
-      window.dispatchEvent(new PopStateEvent('popstate'));
+      window.dispatchEvent(
+        new PopStateEvent('popstate'),
+      );
     });
     expect(result.current[0]).toBe('back');
   });
