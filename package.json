@@ -21,6 +21,21 @@
       "import": "./es/useControlledState/index.js",
       "require": "./lib/useControlledState/index.js"
     },
+    "./useDebouncedValue": {
+      "types": "./es/useDebouncedValue/index.d.ts",
+      "import": "./es/useDebouncedValue/index.js",
+      "require": "./lib/useDebouncedValue/index.js"
+    },
+    "./useDebouncedCallback": {
+      "types": "./es/useDebouncedCallback/index.d.ts",
+      "import": "./es/useDebouncedCallback/index.js",
+      "require": "./lib/useDebouncedCallback/index.js"
+    },
+    "./useThrottledCallback": {
+      "types": "./es/useThrottledCallback/index.d.ts",
+      "import": "./es/useThrottledCallback/index.js",
+      "require": "./lib/useThrottledCallback/index.js"
+    },
     "./useEventCallback": {
       "types": "./es/useEventCallback/index.d.ts",
       "import": "./es/useEventCallback/index.js",
@@ -50,6 +65,16 @@
       "types": "./es/useMemoizedFn/index.d.ts",
       "import": "./es/useMemoizedFn/index.js",
       "require": "./lib/useMemoizedFn/index.js"
+    },
+    "./useInterval": {
+      "types": "./es/useInterval/index.d.ts",
+      "import": "./es/useInterval/index.js",
+      "require": "./lib/useInterval/index.js"
+    },
+    "./useTimeout": {
+      "types": "./es/useTimeout/index.d.ts",
+      "import": "./es/useTimeout/index.js",
+      "require": "./lib/useTimeout/index.js"
     },
     "./usePrevious": {
       "types": "./es/usePrevious/index.d.ts",

@@ -40,6 +40,11 @@ whether one of these already does it correctly.
 |---|---|---|
 | Read the latest value in a callback without re-subscribing (avoid stale closures) | `useLatest` | `references/refs-and-callbacks.md` |
 | A handler with **stable identity** that always runs the latest logic (deps-free) | `useEventCallback` / `useMemoizedFn` | `references/refs-and-callbacks.md` |
+| Debounce a **value** (search box) so it settles only after input stops | `useDebouncedValue` | `references/debounce-throttle.md` |
+| Debounce a **callback** — fire once after calls stop, with latest args | `useDebouncedCallback` | `references/debounce-throttle.md` |
+| Throttle a **callback** — fire at most once per window (leading + trailing) | `useThrottledCallback` | `references/debounce-throttle.md` |
+| Run a callback on a repeating interval (pausable, latest-fn, auto-cleared) | `useInterval` | `references/timers.md` |
+| Run a callback once after a delay (pausable, latest-fn, auto-cleared) | `useTimeout` | `references/timers.md` |
 | A prop that is "controlled if passed, else internal" (`value` + `defaultValue`) | `useControlledState` | `references/state.md` |
 | `setState` that won't warn/leak after unmount (state set in async callbacks) | `useSafeState` | `references/state.md` |
 | Always read the **latest** state synchronously, even when React batches | `useSyncState` | `references/state.md` |
@@ -78,6 +83,12 @@ These smells each map to a library hook — flag them and explain the swap:
   → `useQueryState`.
 - A `value ?? defaultValue` merge with a local `useState` and a sync effect
   → `useControlledState`.
+- A hand-rolled `setTimeout` + `useRef` timer to delay a value or handler,
+  or a `useCallback(debounce(fn), [])` → `useDebouncedValue` /
+  `useDebouncedCallback` / `useThrottledCallback`.
+- A `useEffect` that calls `setInterval`/`setTimeout` and returns a clear in
+  its cleanup (often with a stale callback closed over) → `useInterval` /
+  `useTimeout`.
 
 Examples in the reference files use ordinary app-code formatting — the
 strict 50-character print width is a rule for the library repo itself, not
