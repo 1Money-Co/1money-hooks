@@ -61,3 +61,8 @@ const handle = useMemo(() => debounce(search, 300), [search]); // search is stab
 The key insight: `useMemoizedFn` gives the function a permanent identity but
 always executes the most recent closure, so reading `filters` inside is
 never stale and there is no dependency array to keep in sync.
+
+> For the debounce case specifically, prefer `useDebouncedCallback` (see
+> `references/debounce-throttle.md`) — it already wraps this pattern with a
+> stable runner, latest-args delivery, and unmount-safe cleanup, so you
+> don't need the `useMemoizedFn` + `useMemo(debounce(...))` combo by hand.
