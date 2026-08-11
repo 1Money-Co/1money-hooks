@@ -2,3 +2,7 @@ node_modules/
 lib/
 es/
 *.tgz
+
+# Semgrep rule cache (fetched at pinned SHA by scripts/security-scan.sh)
+.semgrep-rules/
+semgrep.sarif

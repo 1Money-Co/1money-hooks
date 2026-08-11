@@ -1,0 +1,72 @@
+name: Semgrep SAST
+
+# Gates pull requests into `main`.
+#
+# Unlike network-ui — where the same scan is only a release gate, because ~94% of
+# merges into `dev` are local merges that never open a PR — this repo has no
+# `dev` branch and every merge to date has landed through a PR into `main`
+# (#2–#6). So this genuinely is a pre-merge developer check: code is scanned
+# before it reaches `main`, not after it has already shipped to staging.
+#
+# Known gap: publishing is triggered by pushing a `v*` tag (cicd-npm.yml), which
+# is a separate path. A tag pushed to a commit that never went through a PR would
+# publish unscanned. That is currently prevented by convention, not by CI. Adding
+# a scan step to cicd-npm.yml would close it at the cost of slowing publishes;
+# raise it deliberately rather than assuming the tag path is covered.
+#
+# `workflow_dispatch` is kept so the scan can be run on demand against any branch.
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: semgrep-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    name: Semgrep CE
+    runs-on: ubuntu-latest
+    container:
+      # Pinned by digest, not the mutable `semgrep/semgrep` tag. An upstream
+      # release can change parsing, findings, or CLI behaviour with no change
+      # here — which would defeat the point of pinning the ruleset SHA and could
+      # silently alter historical pass/fail results. Digest resolved from
+      # semgrep/semgrep:1.172.0; bump deliberately and re-run the canary.
+      image: semgrep/semgrep@sha256:65dcd4408adda7c183a6b4550cb1e9b19f7f627a6fbb7e0559bd466bedc44d7b
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      # Fails the build if the ruleset stops detecting planted vulnerabilities.
+      # Without this a misconfigured ruleset reports 0 findings and is
+      # indistinguishable from clean code — which is exactly what the Semgrep
+      # registry rulesets did (0 of 4 planted vulns) before network-ui pinned its
+      # own. A gate that cannot fail is worse than no gate: it manufactures
+      # evidence. That risk is sharpest here, where a hooks library has almost no
+      # DOM-sink code and a clean scan is the expected result.
+      - name: Verify ruleset still detects
+        run: ./scripts/security-scan.sh --canary
+
+      - name: Semgrep scan
+        run: ./scripts/security-scan.sh --sarif semgrep.sarif
+
+      # Retained as the audit record for ISO 27001 (1Money-Co/security#18).
+      # GitHub Code Security is disabled on this repo, so SARIF cannot be
+      # uploaded to the Security tab — codeql-action/upload-sarif would hard
+      # fail. This artifact plus the job status is the evidence trail.
+      - name: Upload SARIF (audit evidence)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-sarif-${{ github.run_id }}
+          path: semgrep.sarif
+          retention-days: 90
+          if-no-files-found: warn
