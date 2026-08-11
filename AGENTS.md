@@ -16,7 +16,27 @@ pnpm test             # Run all tests
 pnpm test -- src/useMemoizedFn   # Run tests for a single hook
 pnpm lint             # Check formatting (prettier) + linting (eslint)
 pnpm lint:fix         # Auto-fix formatting and lint issues
+pnpm security         # Semgrep SAST scan (blocks on ERROR severity)
+pnpm security:canary  # Prove the ruleset still detects planted vulns
 ```
+
+Requires `semgrep` on PATH (`python3 -m pip install --user semgrep`).
+
+## Security Scanning
+
+`scripts/security-scan.sh` runs Semgrep CE against semgrep-rules pinned to a
+fixed SHA, fetched into a gitignored `.semgrep-rules/` cache. The same script
+runs locally and in CI (`.github/workflows/semgrep.yml`, gating PRs into
+`main`), so a local pass means a CI pass.
+
+The canary step is not optional ceremony: a hooks library has almost no
+DOM-sink code, so a clean scan is the expected result and a silently broken
+ruleset would look identical to real safety. `--canary` scans planted
+vulnerabilities and fails if the rules stop firing.
+
+This is a port of the same script in `1Money-Co/network-ui`. **Keep the two in
+sync** — if they diverge, "passes in network-ui" stops implying "passes here".
+Changing `RULES_SHA` or the rule directories should happen in both repos.
 
 ## Architecture
 

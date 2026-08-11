@@ -106,7 +106,9 @@
     "lint:es": "eslint src/",
     "lint:es_fix": "eslint src/ --fix",
     "lint:prettier": "prettier --check src/",
-    "lint:prettier_fix": "prettier --write src/"
+    "lint:prettier_fix": "prettier --write src/",
+    "security": "./scripts/security-scan.sh",
+    "security:canary": "./scripts/security-scan.sh --canary"
   },
   "keywords": [],
   "author": "",
