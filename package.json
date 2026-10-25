@@ -6,6 +6,7 @@
   "module": "es/index.js",
   "types": "es/index.d.ts",
   "sideEffects": false,
+  "packageManager": "pnpm@11.25.0",
   "files": [
     "lib",
     "es"
@@ -148,23 +149,5 @@
     "typescript": "~5.5.4",
     "vite": "^8.0.5",
     "vitest": "^4.1.4"
-  },
-  "pnpm": {
-    "overrides": {
-      "@babel/runtime": "7.26.10",
-      "@eslint/plugin-kit": "0.3.4",
-      "@tootallnate/once": "3.0.1",
-      "ajv@6.12.6": "6.14.0",
-      "brace-expansion@2.0.2": "2.0.3",
-      "esbuild": "0.25.0",
-      "flatted": "3.4.2",
-      "lodash": "4.18.0",
-      "minimatch@3.0.8": "3.1.5",
-      "minimatch@3.1.2": "3.1.5",
-      "picomatch@2.3.1": "2.3.2",
-      "picomatch@4.0.3": "4.0.4",
-      "send": "0.19.0",
-      "yaml": "1.10.3"
-    }
   }
 }
