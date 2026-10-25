@@ -13,6 +13,10 @@ export interface QueryStateOptions<T> {
   /**
    * Parse the raw `string` read from the URL into `T`.
    * Defaults to identity (the raw string).
+   * If the parser throws (e.g. malformed JSON from a
+   * crafted URL), the hook falls back to
+   * `defaultValue ?? null` instead of crashing during
+   * render.
    */
   parser?: Parser<T>;
   /**
@@ -117,9 +121,18 @@ function useQueryState<T>(
     if (raw === null) {
       return defaultValue ?? null;
     }
-    return parser
-      ? parser(raw)
-      : (raw as unknown as T);
+    if (!parser) {
+      return raw as unknown as T;
+    }
+    try {
+      return parser(raw);
+    } catch {
+      // Query params are attacker-controlled input: a
+      // crafted URL must never crash the render tree,
+      // so a parser failure falls back to the default
+      // instead of throwing out of the hook.
+      return defaultValue ?? null;
+    }
   };
 
   // Reactive read. Next re-renders consumers when the
